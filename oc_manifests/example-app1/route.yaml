@@ -1,0 +1,23 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: hello-springboot
+  namespace: ocp-demo
+  labels:
+    app: hello-springboot
+    app.io/springboot: hello-world
+    app.kubernetes.io/component: hello-springboot
+    app.kubernetes.io/instance: hello-springboot
+    app.kubernetes.io/name: hello-springboot
+    app.kubernetes.io/part-of: demo-apps
+    app.openshift.io/runtime-version: latest
+spec:
+  to:
+    kind: Service
+    name: hello-springboot
+  port:
+    targetPort: 8082-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

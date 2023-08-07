@@ -1,0 +1,76 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hello-springboot
+  namespace: ocp-demo
+  labels:
+    app: springboot-oc-demo1
+    app.kubernetes.io/component: springboot-oc-demo1
+    app.kubernetes.io/instance: springboot-oc-demo1
+    app.kubernetes.io/name: springboot-oc-demo1
+    app.kubernetes.io/part-of: demo-apps
+    app.openshift.io/runtime: spring-boot
+    app.openshift.io/runtime-namespace: ocp-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-springboot
+  template:
+    metadata:
+      labels:
+        app: hello-springboot
+        app.io/springboot: hello-world
+        deploymentconfig: hello-springboot
+    spec:
+      containers:
+        - name: hello-springboot
+          image: >-
+            docker.io/sharon0706/springboot-oc-demo
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 8082
+              protocol: TCP
+            - containerPort: 8083
+              protocol: TCP
+          env:
+            - name: ENV_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: springboot-oc-cm
+                  key: ENV_PORT
+            - name: ENV_APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: springboot-oc-cm
+                  key: ENV_APP_NAME
+            - name: ENV_SECRET1
+              valueFrom:
+                secretKeyRef:
+                  name: springboot-oc-secret
+                  key: ENV_SECRET1
+            - name: ENV_SECRET2
+              valueFrom:
+                secretKeyRef:
+                  name: springboot-oc-secret
+                  key: ENV_SECRET2
+          resources:
+            limits:
+              cpu: 930m
+              memory: 1120Mi
+            requests:
+              cpu: 910m
+              memory: 1100Mi
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

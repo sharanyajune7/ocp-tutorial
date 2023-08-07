@@ -1,0 +1,45 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: spring-boot
+  namespace: ocp-configmap-demo
+spec:
+  selector:
+    matchLabels: 
+      app: spring-boot
+  replicas: 3
+  template:
+    metadata:
+        labels:
+          app: spring-boot
+    spec:
+      containers:
+        - name: hello-springboot
+          image: >-
+            docker.io/sharon0706/springboot-oc-demo
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 8082
+              protocol: TCP
+            - containerPort: 8083
+              protocol: TCP
+          env:
+            - name: ENV_SECRET1
+              valueFrom:
+                secretKeyRef:
+                  name: springboot-secret
+                  key: ENV_SECRET1
+            - name: ENV_SECRET2
+              valueFrom:
+                secretKeyRef:
+                  name: springboot-secret
+                  key: ENV_SECRET2          
+          resources:
+            limits:
+              cpu: 930m
+              memory: 1120Mi
+            requests:
+              cpu: 910m
+              memory: 1100Mi
+      restartPolicy: Always
