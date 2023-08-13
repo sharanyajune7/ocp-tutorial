@@ -2,12 +2,12 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: spring-boot
-  namespace: ocp-configmap-demo
+  namespace: ocp-demo
 spec:
   selector:
     matchLabels: 
       app: spring-boot
-  replicas: 3
+  replicas: 1
   template:
     metadata:
         labels:
@@ -23,18 +23,7 @@ spec:
             - containerPort: 8082
               protocol: TCP
             - containerPort: 8083
-              protocol: TCP
-          env:
-            - name: ENV_SECRET1
-              valueFrom:
-                secretKeyRef:
-                  name: springboot-secret
-                  key: ENV_SECRET1
-            - name: ENV_SECRET2
-              valueFrom:
-                secretKeyRef:
-                  name: springboot-secret
-                  key: ENV_SECRET2          
+              protocol: TCP  
           resources:
             limits:
               cpu: 930m

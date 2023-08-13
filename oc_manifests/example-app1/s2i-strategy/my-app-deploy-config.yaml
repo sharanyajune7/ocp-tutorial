@@ -1,0 +1,38 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: my-app-deployconfig-deployconfig
+  namespace: testing-workspace
+spec:
+  strategy:
+    type: Rolling
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - my-app-deployconfig
+        from:
+          kind: ImageStreamTag
+          namespace: testing-workspace
+          name: 'my-app:latest'
+    - type: ConfigChange
+  replicas: 1
+  selector:
+    app: my-app-deployconfig
+    deploymentconfig: my-app-deployconfig
+  template:
+    metadata:
+      labels: 
+        app: my-app-deployconfig
+        deploymentconfig: my-app-deployconfig
+    spec:
+      containers:
+        - name: my-app-deployconfig
+          image: 'my-app:latest'
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          resources: {}
+          imagePullPolicy: Always
+      restartPolicy: Always

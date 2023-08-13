@@ -1,0 +1,26 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: my-app-build
+  namespace: testing-workspace
+spec:
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/sharanyajune7/ocp-tutorial.git'
+      ref: main
+    contextDir: /example-app1
+    sourceSecret:
+      name: my-git-secret
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift
+        name: 'java:openjdk-11-ubi8'
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'my-app:latest'
+

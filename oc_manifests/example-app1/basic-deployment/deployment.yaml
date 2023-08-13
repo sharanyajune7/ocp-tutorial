@@ -1,16 +1,38 @@
+kind: Project
+apiVersion: project.openshift.io/v1
+metadata:
+  name: ocp-demo
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: springboot-oc-cm
+  namespace: ocp-demo
+data:
+  ENV_PORT: '8082'
+  ENV_APP_NAME: oc-config-deploy
+
+---
+
+kind: Secret
+apiVersion: v1
+metadata:
+  name: springboot-secret
+  namespace: ocp-configmap-demo
+data:
+  ENV_SECRET1: b2Mtc2VjcmV0LXZhbHVlLTE=
+  ENV_SECRET2: b2Mtc2VjcmV0LXZhbHVlLTI=
+type: Opaque
+
+---
+
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: hello-springboot
   namespace: ocp-demo
-  labels:
-    app: springboot-oc-demo1
-    app.kubernetes.io/component: springboot-oc-demo1
-    app.kubernetes.io/instance: springboot-oc-demo1
-    app.kubernetes.io/name: springboot-oc-demo1
-    app.kubernetes.io/part-of: demo-apps
-    app.openshift.io/runtime: spring-boot
-    app.openshift.io/runtime-namespace: ocp-demo
 spec:
   replicas: 1
   selector:
@@ -74,3 +96,40 @@ spec:
       maxSurge: 25%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: hello-springboot
+  namespace: ocp-demo
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: 8081-tcp
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+    - name: 8082-tcp
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
+  selector:
+    app: ocp-demo
+---
+
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: hello-springboot
+  namespace: ocp-demo
+spec:
+  to:
+    kind: Service
+    name: hello-springboot
+  port:
+    targetPort: 8082-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
